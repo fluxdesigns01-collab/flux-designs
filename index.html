@@ -94,7 +94,7 @@
 
   .gear-showcase { position: relative; width: 420px; height: 420px; }
 
-  .gear-ring { position: absolute; border: 1px solid rgba(123,63,228,0.2); border-radius: 50%; }
+  .gear-ring { position: absolute; border: 1px solid rgba(123,63,228,0.2); border-radius: 50%; will-change: transform; }
   .gear-ring:nth-child(1) { inset: 0; animation: spinSlow 30s linear infinite; }
   .gear-ring:nth-child(2) { inset: 28px; border-style: dashed; border-color: rgba(123,63,228,0.15); animation: spinSlow 20s linear infinite reverse; }
 
@@ -105,17 +105,19 @@
     display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
 
-  /* FIX: explicit aspect ratio on LCP image to prevent layout shift */
+  /* FIX: will-change promotes to GPU layer, prevents forced reflow */
   .gear-img-wrap img {
     width: 92%; height: 92%; object-fit: contain;
     filter: drop-shadow(0 0 30px rgba(123,63,228,0.5));
     animation: floatUpDown 4s ease-in-out infinite;
     aspect-ratio: 1 / 1;
+    will-change: transform;
+    contain: layout style;
   }
 
   /* MARQUEE */
-  .marquee-wrap { background: var(--purple); padding: 1rem 0; overflow: hidden; }
-  .marquee-track { display: flex; gap: 3rem; animation: marquee 22s linear infinite; white-space: nowrap; }
+  .marquee-wrap { background: var(--purple); padding: 1rem 0; overflow: hidden; contain: layout; }
+  .marquee-track { display: flex; gap: 3rem; animation: marquee 22s linear infinite; white-space: nowrap; will-change: transform; }
   .marquee-item { font-family: 'Bebas Neue', cursive; font-size: 1.1rem; letter-spacing: 3px; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 1.5rem; flex-shrink: 0; }
   .marquee-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 50%; flex-shrink: 0; }
 
@@ -144,12 +146,13 @@
   .work-card { border-radius: 10px; overflow: hidden; position: relative; background: var(--charcoal); border: 1px solid rgba(123,63,228,0.15); }
   .work-card:nth-child(1) { grid-row: 1 / 3; }
 
-  /* FIX: explicit width/height on portfolio images to avoid layout shift */
+  /* FIX: work images - let CSS handle display, remove hardcoded dimensions that cause ratio mismatch */
   .work-card img {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; object-position: center;
     transition: transform 0.5s;
     filter: brightness(0.65) saturate(0.85);
+    will-change: transform;
   }
   .work-card:hover img { transform: scale(1.05); filter: brightness(0.85) saturate(1.1); }
 
@@ -222,12 +225,12 @@
   .footer-copy { font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--text-muted); letter-spacing: 1px; }
 
   /* ANIMATIONS */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes pulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translate3d(0,30px,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+  @keyframes fadeDown { from { opacity: 0; transform: translate3d(0,-20px,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+  @keyframes pulse { 0%, 100% { opacity: 0.7; transform: scale3d(1,1,1); } 50% { opacity: 1; transform: scale3d(1.05,1.05,1); } }
   @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes floatUpDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes floatUpDown { 0%, 100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-12px,0); } }
+  @keyframes marquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -363,28 +366,28 @@
   <div class="work-grid reveal">
     <div class="work-card">
       <!-- FIX: lazy load below-fold images -->
-      <img src="gear1.jpeg" alt="Spur Gear with Internal Splines" loading="lazy" width="520" height="520">
+      <img src="gear1.jpeg" alt="Spur Gear with Internal Splines" loading="lazy">
       <div class="work-label">
         <h3>Spur Gear with Internal Splines</h3>
         <p>// SOLIDWORKS · MECHANICAL DESIGN</p>
       </div>
     </div>
     <div class="work-card">
-      <img src="batman.jpeg" alt="Batman Logo Technical Drawing" loading="lazy" width="320" height="260">
+      <img src="batman.jpeg" alt="Batman Logo Technical Drawing" loading="lazy">
       <div class="work-label">
         <h3>Batman Logo — Concept to CAD</h3>
         <p>// SOLIDWORKS · SKETCH TO MODEL</p>
       </div>
     </div>
     <div class="work-card">
-      <img src="frame.jpeg" alt="Steel Weldment Frame" loading="lazy" width="320" height="260">
+      <img src="frame.jpeg" alt="Steel Weldment Frame" loading="lazy">
       <div class="work-label">
         <h3>Steel Weldment Frame</h3>
         <p>// SOLIDWORKS · STRUCTURAL</p>
       </div>
     </div>
     <div class="work-card" style="grid-column: 2 / 4;">
-      <img src="gear2.jpeg" alt="Gear Assembly Detail" loading="lazy" width="640" height="260">
+      <img src="gear2.jpeg" alt="Gear Assembly Detail" loading="lazy">
       <div class="work-label">
         <h3>Gear Assembly — Detail View</h3>
         <p>// SOLIDWORKS · PRECISION PARTS</p>
@@ -477,28 +480,28 @@
       <div class="why-point">
         <span class="why-num" aria-hidden="true">01</span>
         <div class="why-point-content">
-          <h4>Real CAD Expertise</h4>
+          <h3>Real CAD Expertise</h3>
           <p>Every file is built with proper design intent — parametric features, organised feature trees, and files your manufacturer can actually use without rework.</p>
         </div>
       </div>
       <div class="why-point">
         <span class="why-num" aria-hidden="true">02</span>
         <div class="why-point-content">
-          <h4>Secure Upwork Payments</h4>
+          <h3>Secure Upwork Payments</h3>
           <p>Work through Upwork for escrow-protected payments. Money is released only when you approve — zero risk for new clients.</p>
         </div>
       </div>
       <div class="why-point">
         <span class="why-num" aria-hidden="true">03</span>
         <div class="why-point-content">
-          <h4>Fast &amp; Clear Communication</h4>
+          <h3>Fast &amp; Clear Communication</h3>
           <p>Quick response times, milestone updates throughout, and a direct line to the person doing your work — no middlemen.</p>
         </div>
       </div>
       <div class="why-point">
         <span class="why-num" aria-hidden="true">04</span>
         <div class="why-point-content">
-          <h4>Full File Ownership</h4>
+          <h3>Full File Ownership</h3>
           <p>SLDPRT, SLDASM, SLDDRW plus STEP, IGES, STL. Complete source files delivered — your intellectual property, entirely yours.</p>
         </div>
       </div>
@@ -515,7 +518,7 @@
     </p>
     <div class="contact-btns">
       <a href="https://www.upwork.com/freelancers/~01a9dbef083fd85277?mp_source=share" target="_blank" rel="noopener noreferrer" class="platform-btn upwork">↗ Hire on Upwork</a>
-      <a href="#" class="platform-btn fiverr">↗ Find on Fiverr</a>
+      <a href="https://www.fiverr.com/s/KelvGRY" target="_blank" rel="noopener noreferrer" class="platform-btn fiverr">↗ Find on Fiverr</a>
       <a href="mailto:fluxdesigns@gmail.com" class="platform-btn direct">✉ Email Directly</a>
     </div>
   </div>
@@ -533,16 +536,10 @@
 </footer>
 
 <!-- FIX: defer non-critical JS -->
+<!-- FIX: defer non-critical JS -->
 <script defer>
   const revealEls = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
       if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-      }
-    });
-  }, { threshold: 0.1 });
-  revealEls.forEach(el => observer.observe(el));
-</script>
-</body>
-</html>
+        setTimeout(() => entry.target.
